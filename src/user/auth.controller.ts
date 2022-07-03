@@ -6,7 +6,7 @@ import {
     NotFoundException,
     Post, Put,
     Req,
-    Res, UnauthorizedException, UseGuards,
+    Res,
     UseInterceptors
 } from '@nestjs/common';
 import {RegisterDto} from "./dtos/register.dto";
@@ -53,7 +53,9 @@ export class AuthController {
         @Res({passthrough: true}) response: Response,
         @Req() request: Request
     ) {
+        
         const user = await this.userService.findOne({email});
+        
 
         if (!user) {
             throw new NotFoundException('User not found');

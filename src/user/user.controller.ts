@@ -3,12 +3,12 @@ import { Controller, Get } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
-    constructor(private UserService: UserService){
+    constructor(private userService: UserService){
 
     }
 
     @Get()
     async all(){
-        return this.UserService.find();
+        return this.userService.find();
     }
 }
