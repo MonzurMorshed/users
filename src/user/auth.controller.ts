@@ -1,3 +1,4 @@
+import { TokenService } from './token.service';
 import {
     BadRequestException,
     Body, ClassSerializerInterceptor,
@@ -22,6 +23,7 @@ export class AuthController {
 
     constructor(
         private userService: UserService,
+        private tokenService: TokenService,
         private jwtService: JwtService
     ) {
     }
@@ -56,7 +58,6 @@ export class AuthController {
         
         const user = await this.userService.findOne({email});
         
-
         if (!user) {
             throw new NotFoundException('User not found');
         }
@@ -70,6 +71,16 @@ export class AuthController {
             scope
         });
 
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await this.tokenService.save({
+            user_id: user.id,
+            token: jwt,
+            created_at: new Date(),
+            expired_at: tomorrow
+        });
+
         return {
             jwt
         };
@@ -79,13 +90,8 @@ export class AuthController {
     @Get(['/user'])
     async user(@Req() request: Request) {
         const cookie = request.cookies['jwt'];
-
         const {id} = await this.jwtService.verifyAsync(cookie);
-
-        if (request.path === '/api/admin/user') {
-            return this.userService.findOne({id});
-        }
-
+        return this.userService.findOne({id});
     }
 
     // // @UseGuards(AuthGuard)
