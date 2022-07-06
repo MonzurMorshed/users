@@ -22,7 +22,7 @@ export class UserService {
     async findOne(options){
         const user = await this.userRepository.findOne(
             { 
-                where:options 
+                where:options
             }
         );
         return user ;
