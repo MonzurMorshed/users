@@ -23,7 +23,7 @@ export class UserService {
         console.log(options.email);
         const user = await this.userRepository.findOne(
             { 
-                where:options 
+                where:options
             }
         );
         return user ;

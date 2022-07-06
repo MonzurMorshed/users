@@ -15,6 +15,7 @@ import { UserService } from './user.service';
 import * as bcrypt from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
 import {Response, Request} from "express";
+import { AuthGuard } from './auth.guard';
 // import {AuthGuard} from "./auth.guard";
 
 @Controller()
@@ -86,7 +87,7 @@ export class AuthController {
         };
     }
 
-    // // @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Get(['/user'])
     async user(@Req() request: Request) {
         const cookie = request.cookies['jwt'];
@@ -94,15 +95,15 @@ export class AuthController {
         return this.userService.findOne({id});
     }
 
-    // // @UseGuards(AuthGuard)
-    // @Post(['admin/logout', 'ambassador/logout'])
-    // async logout(@Res({passthrough: true}) response: Response) {
-    //     response.clearCookie('jwt');
+    // @UseGuards(AuthGuard)
+    @Post(['admin/logout', 'ambassador/logout'])
+    async logout(@Res({passthrough: true}) response: Response) {
+        response.clearCookie('jwt');
 
-    //     return {
-    //         message: 'success'
-    //     }
-    // }
+        return {
+            message: 'success'
+        }
+    }
 
     // // @UseGuards(AuthGuard)
     // @Put(['admin/users/info', 'ambassador/users/info'])

@@ -12,6 +12,16 @@ export class TokenService {
 
     async save(options){
         return this.tokenRepository.save(options);
-    }    
+    }   
+    
+    async findOne(options){
+        console.log(options.email);
+        const user = await this.tokenRepository.findOne(
+            { 
+                where:options 
+            }
+        );
+        return user ;
+    }
 
 }
