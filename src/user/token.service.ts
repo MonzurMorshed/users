@@ -12,6 +12,17 @@ export class TokenService {
 
     async save(options){
         return this.tokenRepository.save(options);
-    }    
+    }   
+
+    async findOne(options){
+        console.log(options);
+        const user = await this.tokenRepository.findOne({where:options});
+        console.log(user);
+        return user ;
+    }
+    
+    async delete(options){
+        return this.tokenRepository.delete(options);
+    }
 
 }

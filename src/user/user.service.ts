@@ -20,12 +20,15 @@ export class UserService {
     }
 
     async findOne(options){
-        console.log(options.email);
         const user = await this.userRepository.findOne(
             { 
                 where:options 
             }
         );
         return user ;
+    }
+
+    async update(id: number,options){
+        return this.userRepository.update(id,options);
     }
 }

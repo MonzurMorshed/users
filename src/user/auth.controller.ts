@@ -8,6 +8,7 @@ import {
     Post, Put,
     Req,
     Res,
+    UseGuards,
     UseInterceptors
 } from '@nestjs/common';
 import {RegisterDto} from "./dtos/register.dto";
@@ -15,7 +16,7 @@ import { UserService } from './user.service';
 import * as bcrypt from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
 import {Response, Request} from "express";
-// import {AuthGuard} from "./auth.guard";
+import { AuthGuard } from './auth.guard';
 
 @Controller()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -86,7 +87,7 @@ export class AuthController {
         };
     }
 
-    // // @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Get(['/user'])
     async user(@Req() request: Request) {
         const cookie = request.cookies['jwt'];
@@ -94,56 +95,63 @@ export class AuthController {
         return this.userService.findOne({id});
     }
 
-    // // @UseGuards(AuthGuard)
-    // @Post(['admin/logout', 'ambassador/logout'])
-    // async logout(@Res({passthrough: true}) response: Response) {
-    //     response.clearCookie('jwt');
-
-    //     return {
-    //         message: 'success'
-    //     }
-    // }
-
-    // // @UseGuards(AuthGuard)
-    // @Put(['admin/users/info', 'ambassador/users/info'])
-    // async updateInfo(
-    //     @Req() request: Request,
-    //     @Body('first_name') first_name: string,
-    //     @Body('last_name') last_name: string,
-    //     @Body('email') email: string,
-    // ) {
-    //     const cookie = request.cookies['jwt'];
-
-    //     const {id} = await this.jwtService.verifyAsync(cookie);
-
-    //     await this.userService.update(id, {
-    //         first_name,
-    //         last_name,
-    //         email
-    //     })
-
-    //     return this.userService.findOne({id});
-    // }
+    // @UseGuards(AuthGuard)
+    @Post(['/logout'])
+    async logout(@Req() request: Request) {
+        const cookie = request.cookies['jwt'];
+        // console.log(request);
+        const {id} = await this.jwtService.verifyAsync(cookie);
+        // console.log('id' + id);
+        await this.tokenService.delete({user_id: id});
+        return {
+            message: 'success'
+        }
+    }
 
     // // @UseGuards(AuthGuard)
-    // @Put(['admin/users/password', 'ambassador/users/password'])
-    // async updatePassword(
-    //     @Req() request: Request,
-    //     @Body('password') password: string,
-    //     @Body('password_confirm') password_confirm: string,
-    // ) {
-    //     if (password !== password_confirm) {
-    //         throw new BadRequestException('Passwords do not match!');
-    //     }
+    @Put(['/users/info'])
+    async updateInfo(
+        @Req() request: Request,
+        @Body('first_name') first_name: string,
+        @Body('last_name') last_name: string,
+        @Body('email') email: string,
+    ) {
+        const cookie = request.cookies['jwt'];
 
-    //     const cookie = request.cookies['jwt'];
+        const {id} = await this.jwtService.verifyAsync(cookie);
 
-    //     const {id} = await this.jwtService.verifyAsync(cookie);
+        console.log(id);
 
-    //     await this.userService.update(id, {
-    //         password: await bcrypt.hash(password, 12)
-    //     });
+        await this.userService.update(id, {
+            first_name,
+            last_name,
+            email
+        });
 
-    //     return this.userService.findOne({id});
-    // }
+        console.log(this.userService.findOne({id}));
+
+        return this.userService.findOne({id});
+    }
+
+    // // @UseGuards(AuthGuard)
+    @Put(['/users/password'])
+    async updatePassword(
+        @Req() request: Request,
+        @Body('password') password: string,
+        @Body('password_confirm') password_confirm: string,
+    ) {
+        if (password !== password_confirm) {
+            throw new BadRequestException('Passwords do not match!');
+        }
+
+        const cookie = request.cookies['jwt'];
+
+        const {id} = await this.jwtService.verifyAsync(cookie);
+
+        await this.userService.update(id, {
+            password: await bcrypt.hash(password, 12)
+        });
+
+        return this.userService.findOne({id});
+    }
 }
