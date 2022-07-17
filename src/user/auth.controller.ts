@@ -87,7 +87,7 @@ export class AuthController {
         };
     }
 
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Get(['/user'])
     async user(@Req() request: Request) {
         const cookie = request.cookies['jwt'];
