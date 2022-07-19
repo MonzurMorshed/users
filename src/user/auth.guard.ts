@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest();
         
-        try {
+        // try {
             const jwt = request.cookies['jwt'];
             const { id } = await this.jwtService.verify(jwt);
             console.log(new Date());
@@ -20,18 +20,14 @@ export class AuthGuard implements CanActivate {
                 expired_at: MoreThanOrEqual(new Date())
             });
 
-            console.log(userToken);
-
             if (!userToken) return false;
 
             return true;
 
-            // const is_ambassador = request.path.toString().indexOf('api/ambassador') >= 0;
+        // } catch (e) {
+            
+        //     return false;
 
-            // return is_ambassador && scope === 'ambassador' || !is_ambassador && scope === 'admin';
-        } catch (e) {
-            console.log(e.response.data);
-            return false;
-        }
+        // }
     }
 }

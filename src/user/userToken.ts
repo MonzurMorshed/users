@@ -11,6 +11,6 @@ export class UserToken {
     @CreateDateColumn()
     created_at: Date;
 
-    @CreateDateColumn()
-    expire_at: Date;
+    @Column()
+    expired_at: Date;
 }
