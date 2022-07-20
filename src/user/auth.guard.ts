@@ -10,11 +10,11 @@ export class AuthGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest();
-
-        try {
+        
+        // try {
             const jwt = request.cookies['jwt'];
             const { id } = await this.jwtService.verify(jwt);
-
+            console.log(new Date());
             const userToken = await this.tokenService.findOne({
                 user_id: id,
                 expired_at: MoreThanOrEqual(new Date())
@@ -24,10 +24,10 @@ export class AuthGuard implements CanActivate {
 
             return true;
 
-            // const is_ambassador = request.path.toString().indexOf('api/ambassador') >= 0;
-            // return is_ambassador && scope === 'ambassador' || !is_ambassador && scope === 'admin';
-        } catch (e) {
-            return false;
-        }
+        // } catch (e) {
+            
+        //     return false;
+
+        // }
     }
 }

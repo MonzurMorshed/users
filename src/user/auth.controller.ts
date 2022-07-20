@@ -87,7 +87,7 @@ export class AuthController {
         };
     }
 
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Get(['/user'])
     async user(@Req() request: Request) {
         const cookie = request.cookies['jwt'];
@@ -95,13 +95,12 @@ export class AuthController {
         return this.userService.findOne({id});
     }
 
-    // @UseGuards(AuthGuard)
-    @Post(['/logout'])
+    @UseGuards(AuthGuard)
+    @Post(['logout'])
     async logout(@Req() request: Request) {
+        console.log(request);
         const cookie = request.cookies['jwt'];
-        // console.log(request);
         const {id} = await this.jwtService.verifyAsync(cookie);
-        // console.log('id' + id);
         await this.tokenService.delete({user_id: id});
         return {
             message: 'success'
@@ -120,15 +119,11 @@ export class AuthController {
 
         const {id} = await this.jwtService.verifyAsync(cookie);
 
-        console.log(id);
-
         await this.userService.update(id, {
             first_name,
             last_name,
             email
         });
-
-        console.log(this.userService.findOne({id}));
 
         return this.userService.findOne({id});
     }
