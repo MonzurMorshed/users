@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
             return true;
 
             // const is_ambassador = request.path.toString().indexOf('api/ambassador') >= 0;
-
             // return is_ambassador && scope === 'ambassador' || !is_ambassador && scope === 'admin';
         } catch (e) {
             return false;
