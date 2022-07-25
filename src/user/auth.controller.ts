@@ -5,9 +5,11 @@ import {
     Controller,
     Get,
     NotFoundException,
+    Param,
     Post, Put,
     Req,
     Res,
+    UnauthorizedException,
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
@@ -17,6 +19,7 @@ import * as bcrypt from 'bcryptjs';
 import {JwtService} from "@nestjs/jwt";
 import {Response, Request} from "express";
 import { AuthGuard } from './auth.guard';
+import { MoreThanOrEqual } from 'typeorm';
 
 @Controller()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -88,10 +91,26 @@ export class AuthController {
     }
 
     @UseGuards(AuthGuard)
-    @Get(['/user'])
-    async user(@Req() request: Request) {
-        const cookie = request.cookies['jwt'];
-        const {id} = await this.jwtService.verifyAsync(cookie);
+    @Get(['/user/:scope'])
+    async user(
+        @Req() request: Request,
+        @Param('scope') requestScope: string
+    ) {
+        const jwt = request.cookies['jwt'];
+        const { id, scope } = await this.jwtService.verify(jwt);
+        const userToken = await this.tokenService.findOne({
+            user_id: id,
+            expired_at: MoreThanOrEqual(new Date())
+        });
+
+        if(scope == 'admin' && requestScope === 'ambassador' || requestScope == 'admin' && scope === 'ambassador'){
+            throw new UnauthorizedException();
+        }
+
+        if (!userToken){
+            throw new UnauthorizedException();
+        }
+        
         return this.userService.findOne({id});
     }
 
